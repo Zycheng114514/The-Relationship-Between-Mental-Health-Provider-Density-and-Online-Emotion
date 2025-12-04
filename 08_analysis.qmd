@@ -1,0 +1,78 @@
+---
+title: "final_project"
+author: "chris"
+format: html
+editor: visual
+---
+
+```{r}
+library(pacman)
+library(readxl)
+p_load(tidyverse,ggplot2)
+```
+
+```{r}
+dta <- read_excel("data/cleaned/final_data.xlsx")
+```
+
+```{r}
+model_a<-lm(negative_rate~density+income+average_years_schooling + mean_work_hours + mental_health_provider_rate, data= dta)
+summary(model_a)
+```
+
+```{r}
+model_b<-lm(negative_submission_rate~density+average_years_schooling+income+ mean_work_hours + mental_health_provider_rate, data= dta)
+summary(model_b)
+```
+
+```{r}
+model_c<-lm(negative_comment_rate~density+average_years_schooling+income+ mean_work_hours + mental_health_provider_rate, data= dta)
+summary(model_c)
+```
+
+```{r}
+model_test<-lm(negative_rate~density+average_years_schooling+income+ mean_work_hours + mental_health_provider_rate, data= dta)
+summary(model_test)
+
+```
+
+```{r}
+dta_heat <- dta %>%
+  mutate(city = fct_reorder(city, total_observations, .desc = TRUE))
+ggplot(data = dta_heat, aes(x = city, y = year, fill = negative_rate)) +
+  geom_tile(color = "white") + 
+  theme_minimal() + 
+  coord_fixed()
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(forcats)
+
+dta_heat <- dta %>%
+  mutate(city = fct_reorder(city, total_observations, .desc = TRUE))
+
+ggplot(data = dta_heat, aes(x = city, y = factor(year), fill = negative_rate)) +
+  geom_tile(color = "white", linewidth = 0.5) +
+
+  scale_fill_gradient(low = "#fff200", high = "#8b00ff") +
+  
+  theme_minimal(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+    axis.text.y = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10),
+    plot.title = element_text(size = 18, face = "bold")
+  ) +
+  
+  labs(
+    title = "Negative Rate by City and Year",
+    x = "City",
+    y = "Year",
+    fill = "Negative Rate"
+  ) +
+  
+  coord_fixed()
+```
