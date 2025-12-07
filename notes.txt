@@ -1,0 +1,7 @@
+FINAL MODEL RESULTS (Full Data Fit)
+Accuracy:  0.9025
+F1 Score:  0.9327
+Precision: 0.8974
+Recall:    0.9708
+
+with 97% percent of recall rate, the model is excellent in selecting out the negative related texts.

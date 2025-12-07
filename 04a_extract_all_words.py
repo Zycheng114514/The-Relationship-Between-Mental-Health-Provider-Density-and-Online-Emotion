@@ -10,7 +10,7 @@ depress_words = ["suicide", "suicidal"]
 submissions = glob.glob(os.path.join(INPUT_DIR, "*_submissions.csv"))
 comments = glob.glob(os.path.join(INPUT_DIR, "*_comments.csv"))
 
-df_full = pd.DataFrame(columns=["id", "text", "source_type", "city"])
+df_full = pd.DataFrame(columns=["id", "text", "source_type", "city", "date"])
 
 for file in submissions + comments:
     df = pd.read_csv(file, low_memory=False)
@@ -24,6 +24,10 @@ for file in submissions + comments:
         df['source_type'] = 'comment'
         city_name = filename.replace("_comments.csv", "")
     df['city'] = city_name
-    df_full = pd.concat([df_full, df[['id', 'text', 'source_type', 'city']]], ignore_index=True)
+    
+    df['dt_obj'] = pd.to_datetime(df['created_utc'])
+    df['date'] = df['dt_obj'].dt.date
+
+    df_full = pd.concat([df_full, df[['id', 'text', 'source_type', 'city', 'date']]], ignore_index=True)
 
 df_full.to_csv(OUTPUT_DIR, index=False)

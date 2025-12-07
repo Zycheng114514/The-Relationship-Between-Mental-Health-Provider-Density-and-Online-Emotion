@@ -7,9 +7,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-INPUT_PATH_1 = "data/cleaned/depression_corpus.csv" 
-INPUT_PATH_2 = "data/cleaned/suicide_corpus.csv"
-OUTPUT_PATH = "data/cleaned/depression_suicide_corpus_labelled.csv"
+INPUT_PATH = "data/cleaned/direct_corpus.csv"
+OUTPUT_PATH = "data/cleaned/direct_corpus_labelled.csv"
 
 RESULT_COLUMN = "is_negative"
 
@@ -93,9 +92,7 @@ async def process_batch(df, batch_indices, semaphore, system_prompt):
     return updates > 0
 
 async def main():
-    df_1 = pd.read_csv(INPUT_PATH_1)
-    df_2 = pd.read_csv(INPUT_PATH_2)
-    df = pd.concat([df_1, df_2], ignore_index=True)
+    df = pd.read_csv(INPUT_PATH)
     df = df.sample(n=4000)
     df = df.reset_index(drop=True)
 

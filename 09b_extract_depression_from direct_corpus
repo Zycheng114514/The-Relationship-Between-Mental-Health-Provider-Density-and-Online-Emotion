@@ -1,0 +1,20 @@
+import pandas as pd
+import os
+
+INPUT_FILE = "data/cleaned/direct_corpus_predicted.csv"
+OUTPUT_FILE = "data/cleaned/depression_corpus_predicted.csv"
+
+depress_words = ["depressed", "depressing", "depression", "depressive"] 
+
+
+df = pd.read_csv(INPUT_FILE, low_memory=False)
+
+df['text'] = df['text'].astype(str)
+
+pattern = '|'.join(depress_words)
+
+mask = df['text'].str.contains(pattern, case=False, na=False)
+filtered_df = df[mask].copy()
+
+filtered_df.to_csv(OUTPUT_FILE, index=False)
+

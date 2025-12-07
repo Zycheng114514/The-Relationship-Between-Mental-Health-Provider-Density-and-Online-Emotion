@@ -6,32 +6,23 @@ from torch.utils.data import TensorDataset, DataLoader, RandomSampler, Sequentia
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, get_linear_schedule_with_warmup
 from torch.optim import AdamW
 from sklearn.model_selection import KFold
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, precision_recall_fscore_support, r2_score, accuracy_score
 from scipy.stats import pearsonr, spearmanr
 import time
 import datetime
 import random
 import os
 
-DATA_PATH = "data/processed/labelled.csv"
+DATA_PATH = "data/cleaned/direct_corpus_labelled.csv"
 OUTPUT_DIR = "models/finetuned_categories"
-MODEL_NAME = "models/further_pretrained"
-MAX_LEN = 128
+MODEL_NAME = "roberta-base"
+MAX_LEN = 256
 BATCH_SIZE = 16
 EPOCHS = 4
 LEARNING_RATE = 2e-5
 K_FOLDS = 4
 SEED = 114514
-NUM_LABELS = 4 
-
-def compute_metrics(preds, labels):
-    preds = preds.flatten()
-    labels = labels.flatten()
-    mse = mean_squared_error(labels, preds)
-    rmse = np.sqrt(mse)
-    pearson_corr, _ = pearsonr(labels, preds)
-    spearman_corr, _ = spearmanr(labels, preds)
-    return {"rmse": rmse, "pearson": pearson_corr, "spearman": spearman_corr}
+NUM_LABELS = 2
 
 def set_seed(seed_val):
     random.seed(seed_val)
@@ -49,21 +40,18 @@ tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 input_ids = []
 attention_masks = []
 
-for sent in df['content']:
-    encoded_dict = tokenizer.encode_plus(
-        sent,
-        add_special_tokens=True,
-        max_length=MAX_LEN,
-        padding='max_length',
-        truncation=True,
-        return_tensors='pt'
-    )
-    input_ids.append(encoded_dict['input_ids'])
-    attention_masks.append(encoded_dict['attention_mask'])
+encoded_dict = tokenizer.batch_encode_plus(
+    df['text'].tolist(),
+    add_special_tokens=True,
+    max_length=MAX_LEN,
+    padding='max_length',
+    truncation=True,
+    return_tensors='pt'
+)
+input_ids = encoded_dict['input_ids']
+attention_masks = encoded_dict['attention_mask']
 
-input_ids = torch.cat(input_ids, dim=0)
-attention_masks = torch.cat(attention_masks, dim=0)
-labels = torch.tensor(df['category'].values - 1, dtype=torch.long)
+labels = torch.tensor(df['is_negative'].values, dtype=torch.long)
 dataset = TensorDataset(input_ids, attention_masks, labels)
 
 kfold = KFold(n_splits=K_FOLDS, shuffle=True, random_state=SEED)
