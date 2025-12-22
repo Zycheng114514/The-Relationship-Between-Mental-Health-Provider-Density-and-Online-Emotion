@@ -45,3 +45,6 @@ To replicate this research, please run the scripts in the root according to thei
 
 1.  **Main Scripts (e.g., `01_...`, `02_...`):** Run these in numerical order to produce the final results.
 2.  **Assistance Scripts (e.g., `01a_...`, `01b_...`):** These scripts handle supplementary tasks or data cleaning. They are helpful for understanding the workflow but are not the primary drivers of the final output..
+
+## Other things to notice
+1.  ** the sample data used to train the model to identify unrelated observations from all posts is not sampled from the all_word corpus(observation that contain direct words and non-direct words). For 8000 observations, 4000 observations are sampled from observations that contain depression and suicide related words, while another 4000 observations are sampled from direct-word corpus. The final sample dataset has been deduplicated.
